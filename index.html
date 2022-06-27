@@ -25,7 +25,7 @@
         scene.background = null;
         camera.position.z=-5
         camera.position.y=10
-
+        const Speed=0.1
         const DirectionalLight = new THREE.DirectionalLight( 0xffffff, 1, 100 );
 		DirectionalLight.position.set( -10, 10, -5 ); 
 		DirectionalLight.castShadow = true;       
@@ -48,7 +48,10 @@
 
         //const cameraHelper = new THREE.CameraHelper(camera);
         //scene.add(cameraHelper);
-
+        let personPositionA = false;
+        let personPositionD = false;
+        let personPositionW = false;
+        let personPositionS = false;
         const geometry = new THREE.BoxGeometry( 1, 1, 1 );
         const material = new THREE.MeshBasicMaterial( {color: 0x00ff00} );
         const cube = new THREE.Mesh( geometry, material );
@@ -56,13 +59,54 @@
 		cube.receiveShadow = false; 
         scene.add( cube );
 
-		function animate() {
+		async function animate() {
 			requestAnimationFrame( animate );
-
+            if(personPositionA===true){
+                cube.position.x+=Speed
+            }
+            if(personPositionD===true){
+                cube.position.x+=-Speed
+            }
+            if(personPositionS===true){
+                cube.position.z+=-Speed
+            }
+            if(personPositionW===true){
+                cube.position.z+=Speed
+            }
 			renderer.render( scene, camera );
 		};
 		animate();
         
+        document.addEventListener('keydown',function(event) {
+
+            if (event.key == 'w') {
+                personPositionW=true;
+            }
+            if (event.key == 's') {
+                personPositionS=true;
+            }
+            if (event.key == 'a') {
+                personPositionA=true;
+            }
+            if (event.key == 'd') {
+                personPositionD=true;
+            }
+        });
+        document.addEventListener('keyup',function(event) {
+            if (event.key == 'w') {
+                personPositionW=false;
+            }
+            if (event.key == 's') {
+                personPositionS=false;
+            }
+            if (event.key == 'a') {
+                personPositionA=false;
+            }
+            if (event.key == 'd') {
+                personPositionD=false;
+            }
+
+        });
         </script>
     <script>
     </script>
