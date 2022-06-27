@@ -1,12 +1,71 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ru">
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Three js</title>
+    <link rel="stylesheet" href="index.css">
 </head>
 <body>
+    <script type="module">
+        import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.121.1/build/three.module.js';
+        import { DRACOLoader } from 'https://cdn.jsdelivr.net/npm/three@0.121.1/examples/jsm/loaders/DRACOLoader.js';
+        import { OrbitControls } from 'https://cdn.jsdelivr.net/npm/three@0.121.1/examples/jsm/controls/OrbitControls.js';
+        
+
+        const scene = new THREE.Scene();
+		const camera = new THREE.PerspectiveCamera( 100, window.innerWidth / window.innerHeight, 0.1, 1000 );
+        const loader = new THREE.TextureLoader();
+		const renderer = new THREE.WebGLRenderer(/*{ alpha: true }*/);
+		renderer.shadowMap.enabled = true;
+		renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+		renderer.setSize( window.innerWidth, window.innerHeight );
+		document.body.appendChild( renderer.domElement );
+        scene.background = null;
+        camera.position.z=-5
+        camera.position.y=10
+
+        const DirectionalLight = new THREE.DirectionalLight( 0xffffff, 1, 100 );
+		DirectionalLight.position.set( -10, 10, -5 ); 
+		DirectionalLight.castShadow = true;       
+		scene.add( DirectionalLight );
+	
+        const AmbientLight = new THREE.AmbientLight(0xffffff)
+		scene.add(AmbientLight)
+
+
+
+        var DirectionalLightHelper = new THREE.DirectionalLightHelper( DirectionalLight );
+        scene.add( DirectionalLightHelper );
+
+        
+
+        var gridHelper = new THREE.GridHelper( 10, 10 );
+        scene.add( gridHelper );
+
+        const controls = new OrbitControls( camera, renderer.domElement );
+
+        //const cameraHelper = new THREE.CameraHelper(camera);
+        //scene.add(cameraHelper);
+
+        const geometry = new THREE.BoxGeometry( 1, 1, 1 );
+        const material = new THREE.MeshBasicMaterial( {color: 0x00ff00} );
+        const cube = new THREE.Mesh( geometry, material );
+		cube.castShadow = true;     
+		cube.receiveShadow = false; 
+        scene.add( cube );
+
+		function animate() {
+			requestAnimationFrame( animate );
+
+			renderer.render( scene, camera );
+		};
+		animate();
+        
+        </script>
+    <script>
+    </script>
     
 </body>
 </html>
