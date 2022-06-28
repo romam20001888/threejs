@@ -13,14 +13,14 @@
     <canvas id="canv"></canvas> 
     <script type="module">
         import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.121.1/build/three.module.js';
-        import { DRACOLoader } from 'https://cdn.jsdelivr.net/npm/three@0.121.1/examples/jsm/loaders/DRACOLoader.js';
+        import { GLTFLoader } from 'https://cdn.jsdelivr.net/npm/three@0.121.1/examples/jsm/loaders/GLTFLoader.js';
         import { OrbitControls } from 'https://cdn.jsdelivr.net/npm/three@0.121.1/examples/jsm/controls/OrbitControls.js';
         
         let canvas = document.getElementById('canv')
         const scene = new THREE.Scene();
-		const camera = new THREE.PerspectiveCamera( 100, window.innerWidth / window.innerHeight, 0.1, 1000 );
-        //const loader = new THREE.TextureLoader();
-        const loader = new DRACOLoader();
+		const camera = new THREE.PerspectiveCamera( 100, window.innerWidth / window.innerHeight, 0.1, 10000 );
+        const textureloader = new THREE.TextureLoader();
+        const loader = new GLTFLoader();
 		const renderer = new THREE.WebGLRenderer({ 
             alpha: true,
             canvas:canvas
@@ -30,9 +30,12 @@
 		renderer.setSize( window.innerWidth, window.innerHeight );
 		document.body.appendChild( renderer.domElement );
         scene.background = null;
-        camera.position.z=-5
-        camera.position.y=10
-        const Speed=0.1
+        
+        const clock = new THREE.Clock();
+        const controls = new OrbitControls( camera, renderer.domElement );
+        camera.position.z=-400
+        camera.position.y=800  
+        const Speed=20
         const DirectionalLight = new THREE.DirectionalLight( 0xffffff, 1, 100 );
 		DirectionalLight.position.set( -10, 10, -5 ); 
 		DirectionalLight.castShadow = true;       
@@ -43,48 +46,73 @@
 
 
 
-        var DirectionalLightHelper = new THREE.DirectionalLightHelper( DirectionalLight );
-        scene.add( DirectionalLightHelper );
 
-        
 
-        var gridHelper = new THREE.GridHelper( 10, 10 );
-        scene.add( gridHelper );
-
-        const controls = new OrbitControls( camera, renderer.domElement );
-
-        //const cameraHelper = new THREE.CameraHelper(camera);
-        //scene.add(cameraHelper);
         let personPositionA = false;
         let personPositionD = false;
         let personPositionW = false;
         let personPositionS = false;
-        const geometry = new THREE.BoxGeometry( 1, 1, 1 );
-        const material = new THREE.MeshBasicMaterial( {color: 0x00ff00} );
-        const cube = new THREE.Mesh( geometry, material );
-		cube.castShadow = true;     
-		cube.receiveShadow = false; 
-        scene.add( cube );
+
+
+        let mixer;
+        let model = null;
+        loader.load('models/cat/scene.gltf', function (gltf) {
+            model = gltf.scene;
+            model.position.y+=5;
+            mixer = new THREE.AnimationMixer(model);
+            mixer.clipAction(gltf.animations[0]).play();
+            scene.add(gltf.scene);
+        }, undefined, function (error) {
+            console.error(error);
+        });
 
 
 
 		async function animate() {
 			requestAnimationFrame( animate );
             if(personPositionA===true){
-                cube.position.x+=Speed
+                model.position.x+=Speed
                 camera.position.x+=Speed
             }
             if(personPositionD===true){
-                cube.position.x+=-Speed
+                model.position.x+=-Speed
                 camera.position.x+=-Speed
             }
             if(personPositionS===true){
-                cube.position.z+=-Speed
+                model.position.z+=-Speed
                 camera.position.z+=-Speed
             }
             if(personPositionW===true){
-                cube.position.z+=Speed
+                model.position.z+=Speed
                 camera.position.z+=Speed
+            }
+            
+            if(personPositionA===true){
+                model.rotation.y = 1.5;
+            }
+            if(personPositionW===true){
+                 model.rotation.y = 0;
+            }
+            if(personPositionS===true){
+                 model.rotation.y = 3;
+            }
+            if(personPositionD===true){
+                 model.rotation.y = -1.5;
+            }   
+            if(personPositionA===true && personPositionW===true){
+                model.rotation.y = 1;
+            }  
+            if(personPositionD===true && personPositionW===true){
+                model.rotation.y = -1;
+            }  
+            if(personPositionA===true && personPositionS===true){
+                model.rotation.y = 2.5;
+            }  
+            if(personPositionD===true && personPositionS===true){
+                model.rotation.y = -2.5;
+            }
+            if(personPositionA===true || personPositionS===true || personPositionW===true || personPositionD===true){
+                mixer?.update(clock.getDelta());
             }
 			renderer.render( scene, camera );
 		};
@@ -94,7 +122,6 @@
             camera.aspect = window.innerWidth / window.innerHeight
             camera.updateProjectionMatrix()
             renderer.setSize(window.innerWidth, window.innerHeight)
-            render()
         }
         document.addEventListener('keydown',function(event) {
             if (event.key == 'w') {
