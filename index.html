@@ -7,17 +7,24 @@
     <title>Three js</title>
     <link rel="stylesheet" href="index.css">
 </head>
-<body>
+<body> 
+    
+
+    <canvas id="canv"></canvas> 
     <script type="module">
         import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.121.1/build/three.module.js';
         import { DRACOLoader } from 'https://cdn.jsdelivr.net/npm/three@0.121.1/examples/jsm/loaders/DRACOLoader.js';
         import { OrbitControls } from 'https://cdn.jsdelivr.net/npm/three@0.121.1/examples/jsm/controls/OrbitControls.js';
         
-
+        let canvas = document.getElementById('canv')
         const scene = new THREE.Scene();
 		const camera = new THREE.PerspectiveCamera( 100, window.innerWidth / window.innerHeight, 0.1, 1000 );
-        const loader = new THREE.TextureLoader();
-		const renderer = new THREE.WebGLRenderer(/*{ alpha: true }*/);
+        //const loader = new THREE.TextureLoader();
+        const loader = new DRACOLoader();
+		const renderer = new THREE.WebGLRenderer({ 
+            alpha: true,
+            canvas:canvas
+        });
 		renderer.shadowMap.enabled = true;
 		renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 		renderer.setSize( window.innerWidth, window.innerHeight );
@@ -59,26 +66,37 @@
 		cube.receiveShadow = false; 
         scene.add( cube );
 
+
+
 		async function animate() {
 			requestAnimationFrame( animate );
             if(personPositionA===true){
                 cube.position.x+=Speed
+                camera.position.x+=Speed
             }
             if(personPositionD===true){
                 cube.position.x+=-Speed
+                camera.position.x+=-Speed
             }
             if(personPositionS===true){
                 cube.position.z+=-Speed
+                camera.position.z+=-Speed
             }
             if(personPositionW===true){
                 cube.position.z+=Speed
+                camera.position.z+=Speed
             }
 			renderer.render( scene, camera );
 		};
 		animate();
-        
+        window.addEventListener('resize', onWindowResize, false)
+        function onWindowResize() {
+            camera.aspect = window.innerWidth / window.innerHeight
+            camera.updateProjectionMatrix()
+            renderer.setSize(window.innerWidth, window.innerHeight)
+            render()
+        }
         document.addEventListener('keydown',function(event) {
-
             if (event.key == 'w') {
                 personPositionW=true;
             }
@@ -105,7 +123,6 @@
             if (event.key == 'd') {
                 personPositionD=false;
             }
-
         });
         </script>
     <script>
